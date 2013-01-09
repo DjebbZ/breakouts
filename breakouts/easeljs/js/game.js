@@ -23,8 +23,8 @@
     };
 
     var manifest = [
-      { id:"tiles", src:"assets/tiles.png" },
-      { id:"logo", src:"assets/logo.png" }
+      { id:"tiles.png", src:"assets/tiles.png" },
+      { id:"logo.png", src:"assets/logo.png" }
     ].concat(getAudioFiles());
 
     var preloader = new createjs.PreloadJS();
