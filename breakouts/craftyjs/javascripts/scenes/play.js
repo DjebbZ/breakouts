@@ -11,7 +11,12 @@ Crafty.scene('play', function() {
 		Crafty('Ball').destroy();
 		Crafty('Countdown').destroy();
 		
-		if(_level >= breakout.LevelSetups.length) {
+		if(_level === 0) {
+			Crafty.scene('menu');
+			return;
+		}
+
+		if(_level > breakout.LevelSetups.length) {
 			Crafty.scene('win');
 			return;
 		}
@@ -172,8 +177,6 @@ Crafty.scene('play', function() {
 			h: Crafty.stage.elem.clientHeight
 		})
 		.bind('MouseMove', function(e) {
-			// TODO: crap, this is a native MouseEvent
-			// need to make sure this is cross browser compatible
 			_paddle.x = e.offsetX || e.layerX;
 		})
 		//.textColor('#000000')
