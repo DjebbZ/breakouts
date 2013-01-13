@@ -2,9 +2,9 @@
 
   var text, stage;
 
-  var load = function() {
+  function load() {
     // Avoids boring typing 
-    var getAudioFiles = function() {
+    function getAudioFiles() {
       var filesNames = [
         'brickDeath', 'countDownBlip', 'powerdown', 'powerup', 'recover'
       ];
@@ -40,7 +40,7 @@
     preloader.loadManifest(manifest);
   };
 
-  var init = function() {
+  function init() {
 
     stage = new createjs.Stage('stage');
 
@@ -56,7 +56,7 @@
     createjs.Ticker.setFPS(60);
   };
 
-  var tick = function(elapsedTime) {
+  function tick(elapsedTime) {
 
     stage.update();
   };
