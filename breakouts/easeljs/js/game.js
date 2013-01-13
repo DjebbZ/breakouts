@@ -4,6 +4,27 @@
 
     function load() {
 
+        var manifest = [{
+            id: "tiles",
+            src: "assets/tiles.png"
+        }, {
+            id: "logo",
+            src: "assets/logo.png"
+        }, {
+            id: "background",
+            src: "assets/bg_prerendered.png"
+        }].concat(getAudioFiles());
+
+        var progressIndicator = document.getElementById("progress");
+
+        var preloader = new createjs.PreloadJS();
+
+        preloader.onProgress = handleProgress;
+
+        preloader.onComplete = handleComplete;
+
+        preloader.loadManifest(manifest);
+
         // Avoids boring typing 
         function getAudioFiles() {
             var filesNames = ['brickDeath', 'countDownBlip', 'powerdown', 'powerup', 'recover'];
@@ -22,25 +43,14 @@
             return result;
         };
 
-        var manifest = [{
-            id: "tiles.png",
-            src: "assets/tiles.png"
-        }, {
-            id: "logo.png",
-            src: "assets/logo.png"
-        }].concat(getAudioFiles());
+        function handleProgress(event) {
+            progressIndicator.innerHTML = Math.floor(event.loaded * 100);
+        }
 
-        var preloader = new createjs.PreloadJS();
+        function handleComplete(event) {
+            document.getElementById("loading").innerHTML = "Loading complete !";
+        }
 
-        preloader.onProgress = function (event) {
-            console.log("Loading...", Math.floor(event.loaded * 100));
-        };
-
-        preloader.onComplete = function (event) {
-            console.log("Complete", event);
-        };
-
-        preloader.loadManifest(manifest);
     };
 
     function init() {
