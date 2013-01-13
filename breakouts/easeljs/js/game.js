@@ -1,6 +1,6 @@
 (function () {
 
-    var stage;
+    var stage, preloader;
 
     function load() {
 
@@ -16,18 +16,18 @@
         }].concat(getAudioFiles());
 
         stage = new createjs.Stage('stage');
-        var loadingIndicator = new createjs.Text("Loading 0%", "30px Arial", '#000');
 
+        var loadingIndicator = new createjs.Text("Loading 0%", "30px Arial", '#000');
         stage.addChild(loadingIndicator);
 
         loadingIndicator.x = stage.canvas.width/2 - loadingIndicator.getMeasuredWidth()/2;
         loadingIndicator.y = stage.canvas.height/2 - loadingIndicator.getMeasuredHeight()/2;
 
-        createjs.Ticker.addListener(tick);
-        createjs.Ticker.useRAF = true;
-        createjs.Ticker.setFPS(60);
+        // createjs.Ticker.addListener(tick);
+        // createjs.Ticker.useRAF = true;
+        // createjs.Ticker.setFPS(60);
 
-        var preloader = new createjs.PreloadJS();
+        preloader = new createjs.PreloadJS();
 
         preloader.onProgress = handleProgress;
 
@@ -55,9 +55,36 @@
 
         function handleProgress(event) {
             loadingIndicator.text = "Loading " + Math.floor(event.loaded * 100) + "%";
+            stage.update();
         }
 
         function handleComplete(event) {
+            stage.removeAllChildren();
+
+            setBackground();
+            setPlayer();
+            setScoreBoard();
+            setBall();
+            setBricks();
+
+            startGame();
+
+        }
+
+        function setBackground() {
+            var bg_image = preloader.getResult("background").result;
+            var background = new createjs.Bitmap(bg_image);
+            background.x = 0;
+            background.y = 0;
+            stage.addChild(background);
+        }
+
+        function setPlayer() {}
+        function setScoreBoard() {}
+        function setBall() {}
+        function setBricks() {}
+        function startGame() {
+            stage.update();
         }
 
     };
