@@ -1,6 +1,6 @@
-(function () {
+(function() {
 
-    var stage, preloader;
+    var stage, preloader, spritesheet;
 
     function load() {
 
@@ -20,13 +20,12 @@
         var loadingIndicator = new createjs.Text("Loading 0%", "30px Arial", '#000');
         stage.addChild(loadingIndicator);
 
-        loadingIndicator.x = stage.canvas.width/2 - loadingIndicator.getMeasuredWidth()/2;
-        loadingIndicator.y = stage.canvas.height/2 - loadingIndicator.getMeasuredHeight()/2;
+        loadingIndicator.x = getStageHCenter();
+        loadingIndicator.y = getStageVCenter();
 
         // createjs.Ticker.addListener(tick);
         // createjs.Ticker.useRAF = true;
         // createjs.Ticker.setFPS(60);
-
         preloader = new createjs.PreloadJS();
 
         preloader.onProgress = handleProgress;
@@ -36,13 +35,14 @@
         preloader.loadManifest(manifest);
 
         // Avoids boring typing 
+
         function getAudioFiles() {
             var filesNames = ['brickDeath', 'countDownBlip', 'powerdown', 'powerup', 'recover'];
             var extensions = ['.mp3', '.ogg', '.wav'];
             var result = [];
 
-            filesNames.forEach(function (file) {
-                extensions.forEach(function (extension) {
+            filesNames.forEach(function(file) {
+                extensions.forEach(function(extension) {
                     result.push({
                         id: file + extension,
                         src: 'assets/sfx/' + file + extension
@@ -61,6 +61,7 @@
         function handleComplete(event) {
             stage.removeAllChildren();
 
+            buildSpriteSheet();
             setBackground();
             setPlayer();
             setScoreBoard();
@@ -68,7 +69,19 @@
             setBricks();
 
             startGame();
+        }
 
+        function buildSpriteSheet() {
+            var ss = new createjs.SpriteSheet({
+                images: [preloader.getResult("tiles").result],
+                frames: [
+                    [0,64,48,16]
+                ],
+                animations: {
+                    player: 0
+                }
+            });
+            spritesheet = new createjs.BitmapAnimation(ss);
         }
 
         function setBackground() {
@@ -79,14 +92,30 @@
             stage.addChild(background);
         }
 
-        function setPlayer() {}
+        function setPlayer() {
+            var player = spritesheet.gotoAndStop("player");
+            player.x = getStageHCenter();
+            player.y = 368;
+            stage.addChild(player);
+        }
+
         function setScoreBoard() {}
+
         function setBall() {}
+
         function setBricks() {}
+
         function startGame() {
             stage.update();
         }
 
+        function getStageVCenter() {
+            return stage.canvas.height / 2 - loadingIndicator.getMeasuredHeight() / 2;
+        }
+
+        function getStageHCenter() {
+            return stage.canvas.width / 2 - loadingIndicator.getMeasuredWidth() / 2;
+        }
     };
 
     function init() {
