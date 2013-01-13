@@ -1,66 +1,69 @@
-(function() {
+(function () {
 
-  var text, stage;
+    var text, stage;
 
-  function load() {
-    // Avoids boring typing 
-    function getAudioFiles() {
-      var filesNames = [
-        'brickDeath', 'countDownBlip', 'powerdown', 'powerup', 'recover'
-      ];
-      var extensions = ['.mp3', '.ogg', '.wav'];
-      var result = [];
+    function load() {
 
-      filesNames.forEach(function(file) {
-        extensions.forEach(function(extension) {
-          result.push(
-            { id: file + extension, src: 'assets/sfx/' + file + extension }
-          );
-        });
-      });
+        // Avoids boring typing 
+        function getAudioFiles() {
+            var filesNames = ['brickDeath', 'countDownBlip', 'powerdown', 'powerup', 'recover'];
+            var extensions = ['.mp3', '.ogg', '.wav'];
+            var result = [];
 
-      return result;
+            filesNames.forEach(function (file) {
+                extensions.forEach(function (extension) {
+                    result.push({
+                        id: file + extension,
+                        src: 'assets/sfx/' + file + extension
+                    });
+                });
+            });
+
+            return result;
+        };
+
+        var manifest = [{
+            id: "tiles.png",
+            src: "assets/tiles.png"
+        }, {
+            id: "logo.png",
+            src: "assets/logo.png"
+        }].concat(getAudioFiles());
+
+        var preloader = new createjs.PreloadJS();
+
+        preloader.onProgress = function (event) {
+            console.log("Loading...", Math.floor(event.loaded * 100));
+        };
+
+        preloader.onComplete = function (event) {
+            console.log("Complete", event);
+        };
+
+        preloader.loadManifest(manifest);
     };
 
-    var manifest = [
-      { id:"tiles.png", src:"assets/tiles.png" },
-      { id:"logo.png", src:"assets/logo.png" }
-    ].concat(getAudioFiles());
+    function init() {
 
-    var preloader = new createjs.PreloadJS();
+        stage = new createjs.Stage('stage');
 
-    preloader.onProgress = function(event) {
-      console.log("Loading...", Math.floor(event.loaded*100));
+        text = new createjs.Text("Breakout", "Arial 50px", '#333');
+
+        stage.addChild(text);
+
+        text.x = 50;
+        text.y = 50;
+
+        createjs.Ticker.addListener(tick);
+        createjs.Ticker.useRAF = true;
+        createjs.Ticker.setFPS(60);
     };
 
-    preloader.onComplete = function(event) {
-      console.log("Complete", event);
+    function tick(elapsedTime) {
+
+        stage.update();
     };
 
-    preloader.loadManifest(manifest);
-  };
-
-  function init() {
-
-    stage = new createjs.Stage('stage');
-
-    text = new createjs.Text("Breakout", "Arial 50px", '#333');
-
-    stage.addChild(text);
-
-    text.x = 50;
-    text.y = 50;
-
-    createjs.Ticker.addListener(tick);
-    createjs.Ticker.useRAF = true;
-    createjs.Ticker.setFPS(60);
-  };
-
-  function tick(elapsedTime) {
-
-    stage.update();
-  };
-
-  window.addEventListener('load', load);
+    window.addEventListener('load', load);
 
 })();
