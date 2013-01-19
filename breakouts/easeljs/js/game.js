@@ -96,8 +96,8 @@
 
         function setBall() {
             ball.gotoAndStop("ball");
-            ball.x = getStageHCenter();
-            ball.y = 368;
+            ball.x = 50;
+            ball.y = 250;
             stage.addChild(ball);
         }
 
