@@ -1,6 +1,6 @@
 (function() {
 
-    var stage, preloader, spritesheet;
+    var stage, preloader, ball;
 
     function load() {
 
@@ -34,7 +34,7 @@
 
         preloader.loadManifest(manifest);
 
-        // Avoids boring typing 
+        // Avoids boring typing
 
         function getAudioFiles() {
             var filesNames = ['brickDeath', 'countDownBlip', 'powerdown', 'powerup', 'recover'];
@@ -51,7 +51,7 @@
             });
 
             return result;
-        };
+        }
 
         function handleProgress(event) {
             loadingIndicator.text = "Loading " + Math.floor(event.loaded * 100) + "%";
@@ -72,16 +72,14 @@
         }
 
         function buildSpriteSheet() {
-            var ss = new createjs.SpriteSheet({
+            var ballSpriteSheet = new createjs.SpriteSheet({
                 images: [preloader.getResult("tiles").result],
-                frames: [
-                    [0,64,48,16]
-                ],
+                frames: { width:16, height:16 },
                 animations: {
-                    player: 0
+                    ball: [51, 55]
                 }
             });
-            spritesheet = new createjs.BitmapAnimation(ss);
+            ball = new createjs.BitmapAnimation(ballSpriteSheet);
         }
 
         function setBackground() {
@@ -92,16 +90,16 @@
             stage.addChild(background);
         }
 
-        function setPlayer() {
-            var player = spritesheet.gotoAndStop("player");
-            player.x = getStageHCenter();
-            player.y = 368;
-            stage.addChild(player);
-        }
+        function setPlayer() {}
 
         function setScoreBoard() {}
 
-        function setBall() {}
+        function setBall() {
+            ball.gotoAndStop("ball");
+            ball.x = getStageHCenter();
+            ball.y = 368;
+            stage.addChild(ball);
+        }
 
         function setBricks() {}
 
@@ -116,18 +114,18 @@
         function getStageHCenter() {
             return stage.canvas.width / 2 - loadingIndicator.getMeasuredWidth() / 2;
         }
-    };
+    }
 
     function init() {
 
 
 
-    };
+    }
 
     function tick(elapsedTime) {
 
         stage.update();
-    };
+    }
 
     window.addEventListener('load', load);
 
