@@ -1,7 +1,7 @@
 (function() {
 
     /**
-     * Main object
+     * Main game object, start point of the Game application.
      * @type {Object}
      */
     var Game = {
@@ -22,6 +22,16 @@
          * @type {createjs.Preloader}
          */
         loader: null,
+
+        /**
+         * holds references to the various spriteSheets by name
+         * @type {Object}
+         */
+        spriteSheets: {
+            ball: null,
+            bricks: null,
+            paddle: null
+        },
 
         /**
          * Reference to the current level
@@ -96,14 +106,66 @@
             function handleComplete() {
                 Game.stage.removeAllChildren();
 
-                //
+                Game.buildSpriteSheets();
                 Game.currentLevel = new Level(1);
 
-                Game.updateLoop();
+                Game.setupUpdateLoop();
             }
         },
 
-        updateLoop: function() {
+        /**
+         * Creates the various `createjs.SpriteSheet`s once the tiles asset
+         * has been loaded.
+         */
+        buildSpriteSheets: function() {
+            var tileImage = Game.loader.getResult("tiles").result;
+
+            Game.spriteSheets.bricks = new createjs.SpriteSheet({
+                images: [tileImage],
+                frames: {
+                    width: 32,
+                    height: 16
+                },
+                animations: {
+                    blue: 0,
+                    blueDying: [0, 5],
+                    orange: 6,
+                    orangeDying: [6, 11],
+                    red: 12,
+                    redDying: [12, 17],
+                    green: 18,
+                    greenDying: [18, 23]
+                }
+            });
+
+            Game.spriteSheets.ball = new createjs.SpriteSheet({
+                images: [tileImage],
+                frames: {
+                    width: 16,
+                    height: 16
+                },
+                animations: {
+                    ball: {
+                        frames: [51, 52, 53, 54, 55],
+                        frequency: 2
+                    }
+                }
+            });
+
+            Game.spriteSheets.paddle = new createjs.SpriteSheet({
+                images: [tileImage],
+                frames: [
+                    [0, 64, 48, 16],
+                    [0, 80, 32, 16]
+                ],
+                animations: {
+                    normal: 0,
+                    small: 1
+                }
+            });
+        },
+
+        setupUpdateLoop: function() {
             createjs.Ticker.addListener(Game.tick);
             createjs.Ticker.useRAF = true;
             createjs.Ticker.setFPS(60);
@@ -114,84 +176,49 @@
         }
     };
 
-    var Bricks = function(tileImage) {
-        var bricksSpriteSheet = new createjs.SpriteSheet({
-            images: [tileImage],
-            frames: {
-                width: 32,
-                height: 16
-            },
-            animations: {
-                blue: 0,
-                blueDying: [0, 5],
-                orange: 6,
-                orangeDying: [6, 11],
-                red: 12,
-                redDying: [12, 17],
-                green: 18,
-                greenDying: [18, 23]
-            }
-        });
-        this.sprite = new createjs.BitmapAnimation(bricksSpriteSheet);
-    };
-
-    var Ball = function(tileImage) {
-        var ballSpriteSheet = new createjs.SpriteSheet({
-            images: [tileImage],
-            frames: {
-                width: 16,
-                height: 16
-            },
-            animations: {
-                ball: {
-                    frames: [51, 52, 53, 54, 55],
-                    frequency: 2
-                }
-            }
-        });
-        this.sprite = new createjs.BitmapAnimation(ballSpriteSheet);
-    };
-
-    var Paddle = function(tileImage) {
-        var paddleSpriteSheet = new createjs.SpriteSheet({
-            images: [tileImage],
-            frames: [
-                [0, 64, 48, 16],
-                [0, 80, 32, 16]
-            ],
-            animations: {
-                normal: 0,
-                small: 1
-            }
-        });
-        this.sprite = new createjs.BitmapAnimation(paddleSpriteSheet);
-    };
-
+    /**
+     * Represents a level in the game.
+     *
+     * Holds references to the various graphics and display objects used
+     * within this level.
+     * @param {Number} levelNumber Human number (1-indexed) of the level
+     */
     var Level = function(levelNumber) {
-        this.number = levelNumber - 1;
+        /**
+         * Zero-indexed number of the level, used in the levelMaps.
+         * @type {Number}
+         */
+        this.levelNumber = levelNumber - 1;
 
         /**
-         * There can be several `Ball`s at the same time
+         * There can be several balls at the same time.
+         * A ball is an instance of createjs.BitmapAnimation.
          * @type {Array}
          */
         this.balls = [];
 
         /**
-         * Every `Brick` physically present in the level
+         * Every brick physically present in the level.
+         * A brick is an instance of createjs.BitmapAnimation.
          * @type {Array}
          */
         this.bricks = [];
 
         /**
-         * The `Paddle` controlled by the player
-         * @type {Paddle}
+         * The paddle controlled by the player
+         * @type {createjs.BitmapAnimation}
          */
         this.paddle = null;
 
         this.create();
-
     };
 
+    /**
+     * Map that defines the levels, i.e the color and position of each
+     * brick in the level. Property made static so it doesn't eat up more
+     * memory than necessary.
+     * @type {Array}
+     */
     Level.levelsMap = [
         [{
             color: "green",
@@ -261,33 +288,32 @@
      * @return {Level} itsel for chaining
      */
     Level.prototype.create = function() {
-        var tileImage = Game.loader.getResult("tiles").result;
 
         // Adding a ball to the stage
-        var ball = new Ball(tileImage);
-        ball.sprite.gotoAndStop("ball");
-        ball.sprite.x = 50;
-        ball.sprite.y = 250;
-        Game.stage.addChild(ball.sprite);
+        var ball = new createjs.BitmapAnimation(Game.spriteSheets.ball);
+        ball.gotoAndStop("ball");
+        ball.x = 50;
+        ball.y = 250;
+        Game.stage.addChild(ball);
         this.balls.push(ball);
 
         // Adding bricks to the stage
-        var bricks = new Bricks(tileImage);
-        Level.levelsMap[this.number].forEach(function(brickInfo) {
-            bricks.sprite.gotoAndStop(brickInfo.color);
-            bricks.sprite.x = brickInfo.x;
-            bricks.sprite.y = brickInfo.y;
-            Game.stage.addChild(bricks.sprite);
-            this.bricks.push(bricks.sprite);
-            bricks.sprite = bricks.sprite.clone();
+        var bricks = new createjs.BitmapAnimation(Game.spriteSheets.bricks);
+        Level.levelsMap[this.levelNumber].forEach(function(brickInfo) {
+            bricks.gotoAndStop(brickInfo.color);
+            bricks.x = brickInfo.x;
+            bricks.y = brickInfo.y;
+            Game.stage.addChild(bricks);
+            this.bricks.push(bricks);
+            bricks = bricks.clone();
         }, this);
 
         // Adding the paddle
-        var paddle = new Paddle(tileImage);
-        paddle.sprite.gotoAndStop("normal");
-        paddle.sprite.x = Game.stage.canvas.width / 2 - 32;
-        paddle.sprite.y = 368;
-        Game.stage.addChild(paddle.sprite);
+        var paddle = new createjs.BitmapAnimation(Game.spriteSheets.paddle);
+        paddle.gotoAndStop("normal");
+        paddle.x = Game.stage.canvas.width / 2 - 32;
+        paddle.y = 368;
+        Game.stage.addChild(paddle);
         this.paddle = paddle;
 
         return this;
