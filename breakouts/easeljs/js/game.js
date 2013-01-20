@@ -1,6 +1,6 @@
 (function() {
 
-    var stage, preloader, ball;
+    var stage, preloader, ball, bricks, paddle;
 
     function load() {
 
@@ -61,9 +61,9 @@
         function handleComplete(event) {
             stage.removeAllChildren();
 
-            buildSpriteSheet();
+            buildSprites();
             setBackground();
-            setPlayer();
+            setPaddle();
             setScoreBoard();
             setBall();
             setBricks();
@@ -71,26 +71,60 @@
             startGame();
         }
 
-        function buildSpriteSheet() {
+        function buildSprites() {
+            var tileImage = preloader.getResult("tiles").result;
+
             var ballSpriteSheet = new createjs.SpriteSheet({
-                images: [preloader.getResult("tiles").result],
+                images: [tileImage],
                 frames: { width:16, height:16 },
                 animations: {
                     ball: [51, 55]
                 }
             });
             ball = new createjs.BitmapAnimation(ballSpriteSheet);
+
+            var bricksSpriteSheet = new createjs.SpriteSheet({
+                images: [tileImage],
+                frames: { width:32, height:16 },
+                animations: {
+                    blue: 0,
+                    blueDying: [0,5],
+                    orange: 6,
+                    orangeDying: [6,11],
+                    red: 12,
+                    redDying: [12,17],
+                    green: 18,
+                    greenDying: [18,23]
+                }
+            });
+            bricks = new createjs.BitmapAnimation(bricksSpriteSheet);
+
+            var paddleSpriteSheet = new createjs.SpriteSheet({
+                images: [tileImage],
+                frames: [
+                    [0,64,48,16],
+                    [0,80,32,16]
+                ],
+                animations: {
+                    normal: 0,
+                    small: 1
+                }
+            });
+            paddle = new createjs.BitmapAnimation(paddleSpriteSheet);
         }
 
         function setBackground() {
             var bg_image = preloader.getResult("background").result;
             var background = new createjs.Bitmap(bg_image);
-            background.x = 0;
-            background.y = 0;
             stage.addChild(background);
         }
 
-        function setPlayer() {}
+        function setPaddle() {
+            paddle.gotoAndStop("normal");
+            paddle.x = stage.canvas.width / 2 - 32;
+            paddle.y = 368;
+            stage.addChild(paddle);
+        }
 
         function setScoreBoard() {}
 
@@ -98,10 +132,17 @@
             ball.gotoAndStop("ball");
             ball.x = 50;
             ball.y = 250;
+            console.log('ball', ball);
             stage.addChild(ball);
         }
 
-        function setBricks() {}
+        function setBricks() {
+            bricks.gotoAndStop("blue");
+            bricks.x = 60;
+            bricks.y = 60;
+            console.log("bricks", bricks);
+            stage.addChild(bricks);
+        }
 
         function startGame() {
             stage.update();
