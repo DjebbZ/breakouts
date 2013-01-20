@@ -1,6 +1,6 @@
 (function() {
 
-    var stage, preloader, ball, bricks, paddle;
+    var stage, preloader, ball, bricksBitmapAnimation, bricks = [];
 
     function load() {
 
@@ -100,7 +100,7 @@
                     greenDying: [18,23]
                 }
             });
-            bricks = new createjs.BitmapAnimation(bricksSpriteSheet);
+            bricksBitmapAnimation = new createjs.BitmapAnimation(bricksSpriteSheet);
 
             var paddleSpriteSheet = new createjs.SpriteSheet({
                 images: [tileImage],
@@ -139,10 +139,31 @@
         }
 
         function setBricks() {
-            bricks.gotoAndStop("blue");
-            bricks.x = 60;
-            bricks.y = 60;
-            stage.addChild(bricks);
+            var level1 = [
+                { color: "green", x: 118, y: 77},
+                { color: "orange", x: 150, y: 77},
+                { color: "green", x: 182, y: 77},
+                { color: "orange", x: 54, y: 93},
+                { color: "blue", x: 86, y: 93},
+                { color: "green", x: 118, y: 93},
+                { color: "green", x: 150, y: 93},
+                { color: "green", x: 182, y: 93},
+                { color: "blue", x: 214, y: 93},
+                { color: "orange", x: 246, y: 93},
+                { color: "blue", x: 86, y: 109},
+                { color: "blue", x: 118, y: 109},
+                { color: "blue", x: 150, y: 109},
+                { color: "blue", x: 182, y: 109},
+                { color: "blue", x: 214, y: 109}
+            ];
+            level1.forEach(function(brick) {
+                bricksBitmapAnimation.gotoAndStop(brick.color);
+                bricksBitmapAnimation.x = brick.x;
+                bricksBitmapAnimation.y = brick.y;
+                stage.addChild(bricksBitmapAnimation);
+                bricks.push(bricksBitmapAnimation);
+                bricksBitmapAnimation = bricksBitmapAnimation.clone();
+            });
         }
 
         function startGame() {
