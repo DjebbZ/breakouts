@@ -78,7 +78,10 @@
                 images: [tileImage],
                 frames: { width:16, height:16 },
                 animations: {
-                    ball: [51, 55]
+                    ball: {
+                        frames: [51, 52, 53, 54, 55],
+                        frequency: 2
+                    }
                 }
             });
             ball = new createjs.BitmapAnimation(ballSpriteSheet);
@@ -132,7 +135,6 @@
             ball.gotoAndStop("ball");
             ball.x = 50;
             ball.y = 250;
-            console.log('ball', ball);
             stage.addChild(ball);
         }
 
@@ -140,7 +142,6 @@
             bricks.gotoAndStop("blue");
             bricks.x = 60;
             bricks.y = 60;
-            console.log("bricks", bricks);
             stage.addChild(bricks);
         }
 
