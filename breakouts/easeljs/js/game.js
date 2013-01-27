@@ -81,6 +81,7 @@
              * Avoids boring type
              * @return {Array} manifest for audio files
              */
+
             function getAudioFiles() {
                 var filesNames = ['brickDeath', 'countDownBlip', 'powerdown', 'powerup', 'recover'];
                 var extensions = ['.mp3', '.ogg', '.wav'];
@@ -172,12 +173,35 @@
         },
 
         tick: function(elapsedTime) {
-          Game.stage.update();
+            Game.stage.update();
         }
     };
 
     /**
-     * Represents a level in the game.
+     * Ball class
+     * @param {Number} x initial x position
+     * @param {Number} y initial y position
+     */
+    var Ball = function(x, y) {
+        this.initialize(x, y);
+    };
+
+    // setup inheritance
+    Ball.prototype = new createjs.BitmapAnimation();
+
+    // Save parent initialize method
+    Ball.prototype.BitmapAnimation_initalize = Ball.prototype.initialize;
+
+    Ball.prototype.initialize = function(x, y) {
+        this.BitmapAnimation_initalize(Game.spriteSheets.ball);
+        this.x = x;
+        this.y = y;
+
+        this.gotoAndStop('ball');
+    };
+
+    /**
+     * Level class. Represents a level in the game.
      *
      * Holds references to the various graphics and display objects used
      * within this level.
@@ -290,10 +314,7 @@
     Level.prototype.create = function() {
 
         // Adding a ball to the stage
-        var ball = new createjs.BitmapAnimation(Game.spriteSheets.ball);
-        ball.gotoAndStop("ball");
-        ball.x = 50;
-        ball.y = 250;
+        var ball = new Ball(50, 250);
         Game.stage.addChild(ball);
         this.balls.push(ball);
 
