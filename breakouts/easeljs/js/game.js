@@ -24,6 +24,12 @@
         loader: null,
 
         /**
+         * Text that displays the current FPS
+         * @type {createjs.Text}
+         */
+        FPSIndicator: null,
+
+        /**
          * holds references to the various spriteSheets by name
          * @type {Object}
          */
@@ -68,6 +74,8 @@
             Game.loadingIndicator.x = 150;
             Game.loadingIndicator.y = 200;
             Game.stage.addChild(Game.loadingIndicator);
+
+            Game.FPSIndicator = document.getElementById('fps');
 
             Game.loader = new createjs.PreloadJS();
 
@@ -175,6 +183,7 @@
         },
 
         tick: function(elapsedTime) {
+            Game.FPSIndicator.innerText = Math.round(createjs.Ticker.getMeasuredFPS());
             Game.stage.update();
         }
     };
