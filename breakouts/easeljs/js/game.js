@@ -158,8 +158,8 @@
             Game.spriteSheets.paddle = new createjs.SpriteSheet({
                 images: [tileImage],
                 frames: [
-                    [0, 64, 48, 16],
-                    [0, 80, 32, 16]
+                    [0, 64, 48, 16, 0, 24, 8],
+                    [0, 80, 32, 16, 16, 8]
                 ],
                 animations: {
                     normal: 0,
@@ -242,20 +242,19 @@
         this.width = this.normalWidth;
 
         /**
-         * Next horizontal position
+         * Next horizontal position, initialized at initial position
          * @type {Number}
          */
-        this.vX = null;
+        this.vX = x;
         this.gotoAndStop('normal');
     };
 
     /**
-     * Ensure mouse moves
-     * @param  {[type]} mouseX [description]
-     * @return {[type]}        [description]
+     * Calculate next position
+     * @param  {Number} mouseX mouse X position
      */
     Paddle.prototype.calculateMoveFrom = function(mouseX) {
-        this.vX = mouseX - this.width/2;
+        this.vX = mouseX;
     };
 
     /**
@@ -391,7 +390,7 @@
         }, this);
 
         // Adding the paddle
-        var paddle = new Paddle((Game.stage.canvas.width / 2 - 32), 368);
+        var paddle = new Paddle((Game.stage.canvas.width / 2), 368);
         Game.stage.addChild(paddle);
         this.paddle = paddle;
 
@@ -401,7 +400,6 @@
     Level.prototype.setupEvents = function() {
         var level = this;
         Game.stage.onMouseMove = function(mouseEvent) {
-            console.log('mouse moved');
             level.paddle.calculateMoveFrom(mouseEvent.stageX);
         };
     };
