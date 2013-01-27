@@ -201,6 +201,43 @@
     };
 
     /**
+     * Brick class
+     * @param {Number} x     initial x position
+     * @param {Number} y     initial y position
+     * @param {String} color initial SpriteSheet animation
+     */
+    var Brick = function(x, y, color) {
+        this.initialize(x, y, color);
+    };
+
+    Brick.prototype = new createjs.BitmapAnimation();
+
+    Brick.prototype.BitmapAnimation_initalize = Brick.prototype.initialize;
+
+    Brick.prototype.initialize = function(x, y, color) {
+        this.BitmapAnimation_initalize(Game.spriteSheets.bricks);
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        this.gotoAndStop(color);
+    };
+
+    var Paddle = function(x, y) {
+        this.initialize(x, y);
+    };
+
+    Paddle.prototype = new createjs.BitmapAnimation();
+
+    Paddle.prototype.BitmapAnimation_initalize = Paddle.prototype.initialize;
+
+    Paddle.prototype.initialize = function(x, y) {
+        this.BitmapAnimation_initalize(Game.spriteSheets.paddle);
+        this.x = x;
+        this.y = y;
+        this.gotoAndStop('normal');
+    };
+
+    /**
      * Level class. Represents a level in the game.
      *
      * Holds references to the various graphics and display objects used
@@ -319,21 +356,14 @@
         this.balls.push(ball);
 
         // Adding bricks to the stage
-        var bricks = new createjs.BitmapAnimation(Game.spriteSheets.bricks);
         Level.levelsMap[this.levelNumber].forEach(function(brickInfo) {
-            bricks.gotoAndStop(brickInfo.color);
-            bricks.x = brickInfo.x;
-            bricks.y = brickInfo.y;
-            Game.stage.addChild(bricks);
-            this.bricks.push(bricks);
-            bricks = bricks.clone();
+            var brick = new Brick(brickInfo.x, brickInfo.y, brickInfo.color);
+            Game.stage.addChild(brick);
+            this.bricks.push(brick);
         }, this);
 
         // Adding the paddle
-        var paddle = new createjs.BitmapAnimation(Game.spriteSheets.paddle);
-        paddle.gotoAndStop("normal");
-        paddle.x = Game.stage.canvas.width / 2 - 32;
-        paddle.y = 368;
+        var paddle = new Paddle((Game.stage.canvas.width / 2 - 32), 368);
         Game.stage.addChild(paddle);
         this.paddle = paddle;
 
