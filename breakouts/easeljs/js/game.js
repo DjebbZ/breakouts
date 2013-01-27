@@ -108,7 +108,9 @@
                 Game.stage.removeAllChildren();
 
                 Game.buildSpriteSheets();
+
                 Game.currentLevel = new Level(1);
+                Game.currentLevel.setupEvents();
 
                 Game.setupUpdateLoop();
             }
@@ -234,7 +236,33 @@
         this.BitmapAnimation_initalize(Game.spriteSheets.paddle);
         this.x = x;
         this.y = y;
+
+        this.normalWidth = 48;
+        this.smallWidth = 32;
+        this.width = this.normalWidth;
+
+        /**
+         * Next horizontal position
+         * @type {Number}
+         */
+        this.vX = null;
         this.gotoAndStop('normal');
+    };
+
+    /**
+     * Ensure mouse moves
+     * @param  {[type]} mouseX [description]
+     * @return {[type]}        [description]
+     */
+    Paddle.prototype.calculateMoveFrom = function(mouseX) {
+        this.vX = mouseX - this.width/2;
+    };
+
+    /**
+     * Properties calculated on every tick
+     */
+    Paddle.prototype.onTick = function() {
+        this.x = this.vX;
     };
 
     /**
@@ -368,6 +396,14 @@
         this.paddle = paddle;
 
         return this;
+    };
+
+    Level.prototype.setupEvents = function() {
+        var level = this;
+        Game.stage.onMouseMove = function(mouseEvent) {
+            console.log('mouse moved');
+            level.paddle.calculateMoveFrom(mouseEvent.stageX);
+        };
     };
 
     window.addEventListener('load', Game.initialize);
